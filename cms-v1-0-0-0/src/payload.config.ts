@@ -16,11 +16,26 @@ import BeforeDashboard from './components/BeforeDashboard'
 import BeforeLogin from './components/BeforeLogin'
 import { Websites } from './collections/Websites'
 import seoPlugin from '@payloadcms/plugin-seo';
+import { Logo, Icon } from './components/Logos'
+import { Vacancies } from './collections/Vacancies'
 
 const m = path.resolve(__dirname, './emptyModuleMock.js')
 
 export default buildConfig({
   admin: {
+    meta: {
+      titleSuffix: '- Vipersoft',
+      favicon: '/files/images/logo/fav-icon.png',
+      ogImage: '/files/images/logo/logo.svg',
+    },
+    components: {
+      graphics: {
+        Logo,
+        Icon
+      },
+      beforeDashboard: [BeforeDashboard],
+      beforeLogin: [BeforeLogin]
+    },
     css: path.resolve(__dirname, './files/css/main.scss'),
     autoLogin: {
       email: 'demo@payloadcms.com',
@@ -28,10 +43,6 @@ export default buildConfig({
       prefillOnly: true,
     },
     bundler: webpackBundler(), // bundler-config
-    components: {
-      beforeDashboard: [BeforeDashboard],
-      beforeLogin: [BeforeLogin],
-    },
     livePreview: {
       breakpoints: [
         {
@@ -55,7 +66,7 @@ export default buildConfig({
       },
     }),
   },
-  collections: [Users, Posts, Projects, Pages, Media, Categories, Websites],
+  collections: [Users, Posts, Projects, Pages, Media, Categories, Websites, Vacancies],
   editor: lexicalEditor({}),
   typescript: {
     outputFile: path.resolve(__dirname, 'payload-types.ts'),
@@ -66,10 +77,10 @@ export default buildConfig({
   plugins: [payloadCloud(),
   seoPlugin({
     collections: [
-      'websites',
+      'websites', 'pages', 'vacancies'
     ],
-    generateTitle: ({ doc }) => `Website.com — ${doc.title.value}`,
-    generateDescription: ({ doc }) => doc.excerpt
+    generateTitle: () => `Website.com — example text that should be clear`,
+    generateDescription: () => 'Discover the power of our newly upgraded CMS system! Seamlessly manage your content with enhanced features, user-friendly navigation, and robust tools designed to boost productivity. Experience efficiency like never before with our state-of-the-art platform.'
   })
   ],
   db: postgresAdapter({

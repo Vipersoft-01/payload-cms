@@ -11,12 +11,9 @@ import { hero } from '../../fields/hero'
 import { slugField } from '../../fields/slug'
 import { populateArchiveBlock } from '../../hooks/populateArchiveBlock'
 import { populatePublishedDate } from '../../hooks/populatePublishedDate'
-import { revalidatePage } from './hooks/revalidatePage'
-import { Websites } from '../Websites'
-import { number } from 'payload/dist/fields/validations'
 import { updateEntityWithCurrentUserDetails } from '@/utilities/updateGlobalEntity'
 
-export const Pages: CollectionConfig = {
+export const Vacancies: CollectionConfig = {
     access: {
         create: admins,
         delete: () => false,
@@ -62,12 +59,23 @@ export const Pages: CollectionConfig = {
             type: 'text',
         },
         {
+            name: 'short of brief description',
+            required: true,
+            type: 'richText',
+        },
+        {
+            name: 'content description',
+            required: true,
+            type: 'richText'
+        },
+        {
             name: 'publishedDate',
             admin: {
                 position: 'sidebar',
             },
             type: 'date',
         },
+
         {
             tabs: [
                 {
@@ -93,7 +101,7 @@ export const Pages: CollectionConfig = {
     hooks: {
         afterChange: [
             async ({ req, doc }) => {
-                await updateEntityWithCurrentUserDetails(req, doc, "pages")
+                await updateEntityWithCurrentUserDetails(req, doc, "vacancies")
             }
         ],
         afterRead: [populateArchiveBlock],
