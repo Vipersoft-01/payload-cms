@@ -11,27 +11,47 @@ import { hero } from '../../fields/hero'
 import { slugField } from '../../fields/slug'
 import { populateArchiveBlock } from '../../hooks/populateArchiveBlock'
 import { populatePublishedDate } from '../../hooks/populatePublishedDate'
-import { updateEntityWithCurrentUserDetails } from '@/utilities/updateGlobalEntity'
+import { updateEntityWithCurrentUserDetails } from '../../utilities/updateGlobalEntity'
+import { HTMLConverterFeature, lexicalEditor, lexicalHTML } from '@payloadcms/richtext-lexical'
 
 export const Vacancies: CollectionConfig = {
     access: {
-        create: admins,
+        create: () => true,
         delete: () => false,
-        read: adminsOrPublished,
-        update: admins,
+        read: () => true,
+        update: () => true,
     },
     admin: {
         defaultColumns: ['title', 'slug', 'updatedAt'],
         livePreview: {
-            url: ({ data }) =>
-                `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/${data.slug !== 'home' ? data.slug : ''}`,
+            url: 'https://localhost:44357/',
+            breakpoints: [
+                {
+                    label: 'Mobile',
+                    name: 'mobile',
+                    width: 375,
+                    height: 667,
+                },
+                {
+                    label: 'Tablet',
+                    name: 'tablet',
+                    width: 768,
+                    height: 1024,
+                },
+                {
+                    label: 'Desktop',
+                    name: 'desktop',
+                    width: 1440,
+                    height: 900,
+                },
+            ],
         },
-        preview: (doc) => {
-            return `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/api/preview?url=${encodeURIComponent(
-                `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/${doc.slug !== 'home' ? (doc.slug as string) : ''
-                }`,
-            )}&secret=${process.env.PAYLOAD_PUBLIC_DRAFT_SECRET}`
-        },
+        // preview: (doc) => {
+        //     return `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/api/preview?url=${encodeURIComponent(
+        //         `${process.env.PAYLOAD_PUBLIC_SERVER_URL}/${doc.slug !== 'home' ? (doc.slug as string) : ''
+        //         }`,
+        //     )}&secret=${process.env.PAYLOAD_PUBLIC_DRAFT_SECRET}`
+        // },
         useAsTitle: 'title',
     },
     fields: [
@@ -59,42 +79,30 @@ export const Vacancies: CollectionConfig = {
             type: 'text',
         },
         {
-            name: 'short of brief description',
+            name: 'description',
             required: true,
-            type: 'richText',
+            type: 'text'
         },
         {
-            name: 'content description',
+            name: 'content',
             required: true,
-            type: 'richText'
+            type: 'richText',
+            editor: lexicalEditor({
+                features: ({ defaultFeatures }) => [
+                    ...defaultFeatures,
+                    // The HTMLConverter Feature is the feature which manages the HTML serializers.
+                    // If you do not pass any arguments to it, it will use the default serializers.
+                    HTMLConverterFeature({}),
+                ],
+            })
         },
+        lexicalHTML('content', { name: 'content_html' }),
         {
             name: 'publishedDate',
             admin: {
                 position: 'sidebar',
             },
             type: 'date',
-        },
-
-        {
-            tabs: [
-                {
-                    fields: [hero],
-                    label: 'Hero',
-                },
-                {
-                    fields: [
-                        {
-                            name: 'layout',
-                            blocks: [CallToAction, Content, ContentMedia, MediaBlock, Archive],
-                            required: true,
-                            type: 'blocks',
-                        },
-                    ],
-                    label: 'Content',
-                },
-            ],
-            type: 'tabs',
         },
         slugField(),
     ],
@@ -104,10 +112,9 @@ export const Vacancies: CollectionConfig = {
                 await updateEntityWithCurrentUserDetails(req, doc, "vacancies")
             }
         ],
-        afterRead: [populateArchiveBlock],
         beforeChange: [populatePublishedDate],
     },
-    slug: 'pages',
+    slug: 'vacancies',
     versions: {
         drafts: true,
     },

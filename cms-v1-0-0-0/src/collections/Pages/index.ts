@@ -14,7 +14,7 @@ import { populatePublishedDate } from '../../hooks/populatePublishedDate'
 import { revalidatePage } from './hooks/revalidatePage'
 import { Websites } from '../Websites'
 import { number } from 'payload/dist/fields/validations'
-import { updateEntityWithCurrentUserDetails } from '@/utilities/updateGlobalEntity'
+import { updateEntityWithCurrentUserDetails } from '../../utilities/updateGlobalEntity'
 
 export const Pages: CollectionConfig = {
     access: {

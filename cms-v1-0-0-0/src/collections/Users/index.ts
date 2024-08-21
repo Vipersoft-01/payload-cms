@@ -11,9 +11,9 @@ import { updateWebsiteUsers } from './hooks/updateWebsiteUsers'
 
 const Users: CollectionConfig = {
   access: {
-    admin: admins,
     create: admins,
-    delete: admins
+    delete: admins,
+    read: () => true
   },
   admin: {
     defaultColumns: ['name', 'email'],

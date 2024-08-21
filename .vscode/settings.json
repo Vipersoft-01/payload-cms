@@ -1,0 +1,4 @@
+{
+    "gitlens.ai.experimental.model": "openai:gpt-4",
+    "gitlens.ai.experimental.openai.url": "https://openai-michaelbracke.openai.azure.com/openai/deployments/gpt-4/chat/completions?api-version=2023-03-15-preview"
+}

@@ -7,50 +7,29 @@
  */
 
 export interface Config {
-  auth: {
-    users: UserAuthOperations;
-  };
   collections: {
     users: User;
+    posts: Post;
+    projects: Project;
     pages: Page;
     media: Media;
+    categories: Category;
+    websites: Website;
+    vacancies: Vacancy;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
-    websites: Website;
-  };
-  db: {
-    defaultIDType: string;
   };
   globals: {};
-  locale: null;
-  user: User & {
-    collection: 'users';
-  };
-}
-export interface UserAuthOperations {
-  forgotPassword: {
-    email: string;
-    password: string;
-  };
-  login: {
-    email: string;
-    password: string;
-  };
-  registerFirstUser: {
-    email: string;
-    password: string;
-  };
-  unlock: {
-    email: string;
-    password: string;
-  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
-  id: string;
+  id: number;
+  name?: string | null;
+  websites?: (number | Website)[] | null;
+  roles?: ('admin' | 'user')[] | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -59,17 +38,609 @@ export interface User {
   salt?: string | null;
   hash?: string | null;
   loginAttempts?: number | null;
-  lockUntil?: string | null; y
-  password?: string | null;
+  lockUntil?: string | null;
+  password: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "websites".
+ */
+export interface Website {
+  id: number;
+  title: string;
+  users?: (number | User)[] | null;
+  slug?: string | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: number;
+  title: string;
+  categories?: (number | Category)[] | null;
+  publishedOn?: string | null;
+  authors: (number | User)[];
+  populatedAuthors?:
+  | {
+    id?: string | null;
+    name?: string | null;
+  }[]
+  | null;
+  hero: {
+    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact';
+    richText: {
+      root: {
+        type: string;
+        children: {
+          type: string;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
+    links?:
+    | {
+      link: {
+        type?: ('reference' | 'custom') | null;
+        newTab?: boolean | null;
+        reference?: {
+          relationTo: 'pages';
+          value: number | Page;
+        } | null;
+        url?: string | null;
+        label: string;
+        appearance?: ('default' | 'primary' | 'secondary') | null;
+      };
+      id?: string | null;
+    }[]
+    | null;
+    media?: number | Media | null;
+  };
+  layout: (
+    | {
+      invertBackground?: boolean | null;
+      richText: {
+        root: {
+          type: string;
+          children: {
+            type: string;
+            version: number;
+            [k: string]: unknown;
+          }[];
+          direction: ('ltr' | 'rtl') | null;
+          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+          indent: number;
+          version: number;
+        };
+        [k: string]: unknown;
+      };
+      links?:
+      | {
+        link: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?: {
+            relationTo: 'pages';
+            value: number | Page;
+          } | null;
+          url?: string | null;
+          label: string;
+          appearance?: ('primary' | 'secondary') | null;
+        };
+        id?: string | null;
+      }[]
+      | null;
+      id?: string | null;
+      blockName?: string | null;
+      blockType: 'cta';
+    }
+    | {
+      invertBackground?: boolean | null;
+      columns?:
+      | {
+        size?: ('oneThird' | 'half' | 'twoThirds' | 'full') | null;
+        richText: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        enableLink?: boolean | null;
+        link?: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?: {
+            relationTo: 'pages';
+            value: number | Page;
+          } | null;
+          url?: string | null;
+          label: string;
+          appearance?: ('default' | 'primary' | 'secondary') | null;
+        };
+        id?: string | null;
+      }[]
+      | null;
+      id?: string | null;
+      blockName?: string | null;
+      blockType: 'content';
+    }
+    | {
+      invertBackground?: boolean | null;
+      mediaPosition?: ('left' | 'right') | null;
+      richText: {
+        root: {
+          type: string;
+          children: {
+            type: string;
+            version: number;
+            [k: string]: unknown;
+          }[];
+          direction: ('ltr' | 'rtl') | null;
+          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+          indent: number;
+          version: number;
+        };
+        [k: string]: unknown;
+      };
+      media: number | Media;
+      id?: string | null;
+      blockName?: string | null;
+      blockType: 'contentMedia';
+    }
+    | {
+      invertBackground?: boolean | null;
+      position?: ('default' | 'fullscreen') | null;
+      media: number | Media;
+      id?: string | null;
+      blockName?: string | null;
+      blockType: 'mediaBlock';
+    }
+    | {
+      introContent: {
+        root: {
+          type: string;
+          children: {
+            type: string;
+            version: number;
+            [k: string]: unknown;
+          }[];
+          direction: ('ltr' | 'rtl') | null;
+          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+          indent: number;
+          version: number;
+        };
+        [k: string]: unknown;
+      };
+      populateBy?: ('collection' | 'selection') | null;
+      relationTo?: ('posts' | 'projects') | null;
+      categories?: (number | Category)[] | null;
+      limit?: number | null;
+      selectedDocs?:
+      | (
+        | {
+          relationTo: 'posts';
+          value: number | Post;
+        }
+        | {
+          relationTo: 'projects';
+          value: number | Project;
+        }
+      )[]
+      | null;
+      populatedDocs?:
+      | (
+        | {
+          relationTo: 'posts';
+          value: number | Post;
+        }
+        | {
+          relationTo: 'projects';
+          value: number | Project;
+        }
+      )[]
+      | null;
+      populatedDocsTotal?: number | null;
+      id?: string | null;
+      blockName?: string | null;
+      blockType: 'archive';
+    }
+  )[];
+  enablePremiumContent?: boolean | null;
+  premiumContent?:
+  | (
+    | {
+      invertBackground?: boolean | null;
+      richText: {
+        root: {
+          type: string;
+          children: {
+            type: string;
+            version: number;
+            [k: string]: unknown;
+          }[];
+          direction: ('ltr' | 'rtl') | null;
+          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+          indent: number;
+          version: number;
+        };
+        [k: string]: unknown;
+      };
+      links?:
+      | {
+        link: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?: {
+            relationTo: 'pages';
+            value: number | Page;
+          } | null;
+          url?: string | null;
+          label: string;
+          appearance?: ('primary' | 'secondary') | null;
+        };
+        id?: string | null;
+      }[]
+      | null;
+      id?: string | null;
+      blockName?: string | null;
+      blockType: 'cta';
+    }
+    | {
+      invertBackground?: boolean | null;
+      columns?:
+      | {
+        size?: ('oneThird' | 'half' | 'twoThirds' | 'full') | null;
+        richText: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        enableLink?: boolean | null;
+        link?: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?: {
+            relationTo: 'pages';
+            value: number | Page;
+          } | null;
+          url?: string | null;
+          label: string;
+          appearance?: ('default' | 'primary' | 'secondary') | null;
+        };
+        id?: string | null;
+      }[]
+      | null;
+      id?: string | null;
+      blockName?: string | null;
+      blockType: 'content';
+    }
+    | {
+      invertBackground?: boolean | null;
+      position?: ('default' | 'fullscreen') | null;
+      media: number | Media;
+      id?: string | null;
+      blockName?: string | null;
+      blockType: 'mediaBlock';
+    }
+    | {
+      introContent: {
+        root: {
+          type: string;
+          children: {
+            type: string;
+            version: number;
+            [k: string]: unknown;
+          }[];
+          direction: ('ltr' | 'rtl') | null;
+          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+          indent: number;
+          version: number;
+        };
+        [k: string]: unknown;
+      };
+      populateBy?: ('collection' | 'selection') | null;
+      relationTo?: ('posts' | 'projects') | null;
+      categories?: (number | Category)[] | null;
+      limit?: number | null;
+      selectedDocs?:
+      | (
+        | {
+          relationTo: 'posts';
+          value: number | Post;
+        }
+        | {
+          relationTo: 'projects';
+          value: number | Project;
+        }
+      )[]
+      | null;
+      populatedDocs?:
+      | (
+        | {
+          relationTo: 'posts';
+          value: number | Post;
+        }
+        | {
+          relationTo: 'projects';
+          value: number | Project;
+        }
+      )[]
+      | null;
+      populatedDocsTotal?: number | null;
+      id?: string | null;
+      blockName?: string | null;
+      blockType: 'archive';
+    }
+  )[]
+  | null;
+  relatedPosts?: (number | Post)[] | null;
+  slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "categories".
+ */
+export interface Category {
+  id: number;
+  title?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "pages".
  */
 export interface Page {
-  id: string;
-  title?: string | null;
-  content?: {
+  id: number;
+  website?: string | null;
+  owner?: string | null;
+  title: string;
+  publishedDate?: string | null;
+  hero: {
+    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact';
+    richText: {
+      root: {
+        type: string;
+        children: {
+          type: string;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
+    links?:
+    | {
+      link: {
+        type?: ('reference' | 'custom') | null;
+        newTab?: boolean | null;
+        reference?: {
+          relationTo: 'pages';
+          value: number | Page;
+        } | null;
+        url?: string | null;
+        label: string;
+        appearance?: ('default' | 'primary' | 'secondary') | null;
+      };
+      id?: string | null;
+    }[]
+    | null;
+    media?: number | Media | null;
+  };
+  layout: (
+    | {
+      invertBackground?: boolean | null;
+      richText: {
+        root: {
+          type: string;
+          children: {
+            type: string;
+            version: number;
+            [k: string]: unknown;
+          }[];
+          direction: ('ltr' | 'rtl') | null;
+          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+          indent: number;
+          version: number;
+        };
+        [k: string]: unknown;
+      };
+      links?:
+      | {
+        link: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?: {
+            relationTo: 'pages';
+            value: number | Page;
+          } | null;
+          url?: string | null;
+          label: string;
+          appearance?: ('primary' | 'secondary') | null;
+        };
+        id?: string | null;
+      }[]
+      | null;
+      id?: string | null;
+      blockName?: string | null;
+      blockType: 'cta';
+    }
+    | {
+      invertBackground?: boolean | null;
+      columns?:
+      | {
+        size?: ('oneThird' | 'half' | 'twoThirds' | 'full') | null;
+        richText: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        enableLink?: boolean | null;
+        link?: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?: {
+            relationTo: 'pages';
+            value: number | Page;
+          } | null;
+          url?: string | null;
+          label: string;
+          appearance?: ('default' | 'primary' | 'secondary') | null;
+        };
+        id?: string | null;
+      }[]
+      | null;
+      id?: string | null;
+      blockName?: string | null;
+      blockType: 'content';
+    }
+    | {
+      invertBackground?: boolean | null;
+      mediaPosition?: ('left' | 'right') | null;
+      richText: {
+        root: {
+          type: string;
+          children: {
+            type: string;
+            version: number;
+            [k: string]: unknown;
+          }[];
+          direction: ('ltr' | 'rtl') | null;
+          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+          indent: number;
+          version: number;
+        };
+        [k: string]: unknown;
+      };
+      media: number | Media;
+      id?: string | null;
+      blockName?: string | null;
+      blockType: 'contentMedia';
+    }
+    | {
+      invertBackground?: boolean | null;
+      position?: ('default' | 'fullscreen') | null;
+      media: number | Media;
+      id?: string | null;
+      blockName?: string | null;
+      blockType: 'mediaBlock';
+    }
+    | {
+      introContent: {
+        root: {
+          type: string;
+          children: {
+            type: string;
+            version: number;
+            [k: string]: unknown;
+          }[];
+          direction: ('ltr' | 'rtl') | null;
+          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+          indent: number;
+          version: number;
+        };
+        [k: string]: unknown;
+      };
+      populateBy?: ('collection' | 'selection') | null;
+      relationTo?: ('posts' | 'projects') | null;
+      categories?: (number | Category)[] | null;
+      limit?: number | null;
+      selectedDocs?:
+      | (
+        | {
+          relationTo: 'posts';
+          value: number | Post;
+        }
+        | {
+          relationTo: 'projects';
+          value: number | Project;
+        }
+      )[]
+      | null;
+      populatedDocs?:
+      | (
+        | {
+          relationTo: 'posts';
+          value: number | Post;
+        }
+        | {
+          relationTo: 'projects';
+          value: number | Project;
+        }
+      )[]
+      | null;
+      populatedDocsTotal?: number | null;
+      id?: string | null;
+      blockName?: string | null;
+      blockType: 'archive';
+    }
+  )[];
+  slug?: string | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: number;
+  alt: string;
+  caption?: {
     root: {
       type: string;
       children: {
@@ -86,30 +657,7 @@ export interface Page {
   } | null;
   updatedAt: string;
   createdAt: string;
-  owner: any;
-  website: any;
-}
-
-
-export interface Website {
-  id: string;
-  title?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  users?: User[];
-}
-
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: string;
-  text?: string | null;
-  updatedAt: string;
-  createdAt: string;
   url?: string | null;
-  thumbnailURL?: string | null;
   filename?: string | null;
   mimeType?: string | null;
   filesize?: number | null;
@@ -120,13 +668,240 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects".
+ */
+export interface Project {
+  id: number;
+  title: string;
+  categories?: (number | Category)[] | null;
+  publishedDate?: string | null;
+  hero: {
+    richText: {
+      root: {
+        type: string;
+        children: {
+          type: string;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    };
+    media?: number | Media | null;
+  };
+  layout: (
+    | {
+      invertBackground?: boolean | null;
+      richText: {
+        root: {
+          type: string;
+          children: {
+            type: string;
+            version: number;
+            [k: string]: unknown;
+          }[];
+          direction: ('ltr' | 'rtl') | null;
+          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+          indent: number;
+          version: number;
+        };
+        [k: string]: unknown;
+      };
+      links?:
+      | {
+        link: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?: {
+            relationTo: 'pages';
+            value: number | Page;
+          } | null;
+          url?: string | null;
+          label: string;
+          appearance?: ('primary' | 'secondary') | null;
+        };
+        id?: string | null;
+      }[]
+      | null;
+      id?: string | null;
+      blockName?: string | null;
+      blockType: 'cta';
+    }
+    | {
+      invertBackground?: boolean | null;
+      columns?:
+      | {
+        size?: ('oneThird' | 'half' | 'twoThirds' | 'full') | null;
+        richText: {
+          root: {
+            type: string;
+            children: {
+              type: string;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        };
+        enableLink?: boolean | null;
+        link?: {
+          type?: ('reference' | 'custom') | null;
+          newTab?: boolean | null;
+          reference?: {
+            relationTo: 'pages';
+            value: number | Page;
+          } | null;
+          url?: string | null;
+          label: string;
+          appearance?: ('default' | 'primary' | 'secondary') | null;
+        };
+        id?: string | null;
+      }[]
+      | null;
+      id?: string | null;
+      blockName?: string | null;
+      blockType: 'content';
+    }
+    | {
+      invertBackground?: boolean | null;
+      mediaPosition?: ('left' | 'right') | null;
+      richText: {
+        root: {
+          type: string;
+          children: {
+            type: string;
+            version: number;
+            [k: string]: unknown;
+          }[];
+          direction: ('ltr' | 'rtl') | null;
+          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+          indent: number;
+          version: number;
+        };
+        [k: string]: unknown;
+      };
+      media: number | Media;
+      id?: string | null;
+      blockName?: string | null;
+      blockType: 'contentMedia';
+    }
+    | {
+      invertBackground?: boolean | null;
+      position?: ('default' | 'fullscreen') | null;
+      media: number | Media;
+      id?: string | null;
+      blockName?: string | null;
+      blockType: 'mediaBlock';
+    }
+    | {
+      introContent: {
+        root: {
+          type: string;
+          children: {
+            type: string;
+            version: number;
+            [k: string]: unknown;
+          }[];
+          direction: ('ltr' | 'rtl') | null;
+          format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+          indent: number;
+          version: number;
+        };
+        [k: string]: unknown;
+      };
+      populateBy?: ('collection' | 'selection') | null;
+      relationTo?: ('posts' | 'projects') | null;
+      categories?: (number | Category)[] | null;
+      limit?: number | null;
+      selectedDocs?:
+      | (
+        | {
+          relationTo: 'posts';
+          value: number | Post;
+        }
+        | {
+          relationTo: 'projects';
+          value: number | Project;
+        }
+      )[]
+      | null;
+      populatedDocs?:
+      | (
+        | {
+          relationTo: 'posts';
+          value: number | Post;
+        }
+        | {
+          relationTo: 'projects';
+          value: number | Project;
+        }
+      )[]
+      | null;
+      populatedDocsTotal?: number | null;
+      id?: string | null;
+      blockName?: string | null;
+      blockType: 'archive';
+    }
+  )[];
+  relatedProjects?: (number | Project)[] | null;
+  slug?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "vacancies".
+ */
+export interface Vacancy {
+  id: number;
+  website?: string | null;
+  owner?: string | null;
+  title: string;
+  description: string;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: string;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  content_html?: string | null;
+  publishedDate?: string | null;
+  slug?: string | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: string;
+  id: number;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   key?: string | null;
   value?:
@@ -146,18 +921,11 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: string;
+  id: number;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
   createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "auth".
- */
-export interface Auth {
-  [k: string]: unknown;
 }
 
 

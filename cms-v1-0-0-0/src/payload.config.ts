@@ -37,11 +37,11 @@ export default buildConfig({
       beforeLogin: [BeforeLogin]
     },
     css: path.resolve(__dirname, './files/css/main.scss'),
-    autoLogin: {
-      email: 'demo@payloadcms.com',
-      password: 'demo',
-      prefillOnly: true,
-    },
+    // autoLogin: {
+    //   email: 'demo@payloadcms.com',
+    //   password: 'demo',
+    //   prefillOnly: true,
+    // },
     bundler: webpackBundler(), // bundler-config
     livePreview: {
       breakpoints: [

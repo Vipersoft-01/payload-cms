@@ -53,7 +53,7 @@ export async function updateEntityWithCurrentUserDetails(req: PayloadRequest, do
             found_pages_db.forEach(async (page) => {
                 page.owner = JSON.stringify(found_users_db[0]),
                     page.website = JSON.stringify(found_websites_db[0])
-                await req.payload.update({ collection: 'pages', id: page.id, data: page })
+                await req.payload.update({ collection: collection, id: page.id, data: page })
             });
 
 
